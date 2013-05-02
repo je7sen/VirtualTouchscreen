@@ -50,7 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\opencv\build\include\opencv;C:\opencv\build\include;C:\Users\je7sen\Documents\Visual Studio 2010\Projects\VirtualTouchScreen\VirtualTouchScreen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\opencv\build\include\opencv;C:\opencv\build\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -87,6 +87,9 @@
     <ClCompile Include="cvlabel.cpp" />
     <ClCompile Include="cvtrack.cpp" />
     <ClCompile Include="VirtualTouchScreen.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cvblob.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
