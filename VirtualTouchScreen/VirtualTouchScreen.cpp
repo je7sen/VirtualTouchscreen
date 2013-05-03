@@ -130,12 +130,12 @@ while(1)
 	
 	//time counting to enable click
 	beginTime = timestamp;
-	cout<<"Begin Time :"<<beginTime<<endl;
-	cout<<"End Time :"<<endTime<<endl;
+	//cout<<"Begin Time :"<<beginTime<<endl;
+	//cout<<"End Time :"<<endTime<<endl;
 	StopTime = beginTime - endTime;
 	
 	// Implement left mouse click event
-	if(StopTime > 5  && endTime >0 )
+	if(StopTime > 0.5  && endTime >0 )
 	{
 		//MouseClick Event
 		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
