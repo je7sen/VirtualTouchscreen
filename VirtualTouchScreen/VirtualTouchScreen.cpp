@@ -7,10 +7,13 @@
 #include "cvblob.h"
 //Windows Headers
 #include<winuser.h>
+#include<WinBase.h>
+
 //Time and Windows Routines
 #include<time.h>
 
-
+// include thread
+//#include<thread\thread.hpp>
 
 //Definitions
 #define h 240
@@ -60,6 +63,11 @@ int screeny = GetSystemMetrics(SM_CYSCREEN);
 //Variables for trackbars
 int h1=23;int s1=229;int v1=8;
 int h2=39;int s2=255;int v2=255;
+
+//Variables for time counting
+double beginTime=0;
+double endTime=0;
+double StopTime=0;
 
 //Creating the trackbars
 cvCreateTrackbar("Hue_1","Control",&h1,255,0);
@@ -113,6 +121,29 @@ while(1)
 	//Filtering the blobs
 	cvFilterByArea(blobs,60,500);
 
+	// Start capturing cursor (found cursor on screen)
+	bool cursorCaptured = false;
+	bool cursorDisappear = false;
+	int x = 0;
+	int y = 0;
+	
+	
+	//time counting to enable click
+	beginTime = timestamp;
+	cout<<"Begin Time :"<<beginTime<<endl;
+	cout<<"End Time :"<<endTime<<endl;
+	StopTime = beginTime - endTime;
+	
+	// Implement left mouse click event
+	if(StopTime > 5  && endTime >0 )
+	{
+		//MouseClick Event
+		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+		cout<<" click "<<endl;
+		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+		endTime=0;
+	}
+	
 	for (CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
 	{
 		double moment10 = it->second->m10;
@@ -128,25 +159,26 @@ while(1)
 		y1 = moment01/area;
 
 		//Mapping to the screen coordinates
-		int x=(int)(x1*screenx/w);
-		int y=(int)(y1*screeny/h);
+		x=(int)(x1*screenx/w);
+		y=(int)(y1*screeny/h);
 
 		//Printing the position information
 		cout<<"X-CursorPosition: "<<x<<" Y-CursorPosition: "<<y<<endl;
 
-
 		//Moving the mouse pointer
+		cursorCaptured = true;
 		SetCursorPos(x,y);
-
-		if(it==blobs.end() && timestamp == 0.5 )
-		{
-		//MouseClick Event
-		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
-		cout<<"click "<<endl;
-		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
-		}
+		endTime = timestamp;
 	}
 
+	
+	StopTime = beginTime - endTime;
+
+	//clear cvBlob
+	//blobs.clear();
+	cursorDisappear = true;
+
+	
 	
 
 	//Showing the images
