@@ -6,19 +6,19 @@ A camera based application to have full control of mouse using hand gesture base
 
 Requirement
 -----------
--OpenCV 2.3.1
--Visual Studio 2010
+- OpenCV 2.3.1
+- Visual Studio 2010
 
 
 Setup Configuration
 -------------------
--add these directories inside the project properties (C/C++\General\Additional Include Directories) 
+- add these directories inside the project properties (C/C++\General\Additional Include Directories) 
 	<dir..>\opencv\build\include\opencv
 	<dir..>\VirtualTouchscreen\VirtualTouchScreen(cvBlobs library)
 	<dir..>\opencv\build\include
--add these linker library inside the project properties (Linker\General\Additional Library Directories)
+- add these linker library inside the project properties (Linker\General\Additional Library Directories)
 	<dir..>\opencv\build\x86\vc12\lib
--add these lib insede the project properties (Linker\Input\Additional Dependencies)
+- add these lib insede the project properties (Linker\Input\Additional Dependencies)
 	opencv_core231d.lib
 	opencv_imgproc231d.lib
 	opencv_highgui231d.lib
@@ -31,7 +31,7 @@ Setup Configuration
 	opencv_contrib231d.lib
 	opencv_legacy231d.lib
 	opencv_flann231d.lib
--add these inside the system environment variable
+- add these inside the system environment variable
 	<dir..>\opencv\build\include\x86\vc10\bin
 
 

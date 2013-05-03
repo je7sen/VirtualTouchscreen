@@ -12,8 +12,6 @@
 //Time and Windows Routines
 #include<time.h>
 
-// include thread
-//#include<thread\thread.hpp>
 
 //Definitions
 #define h 240
@@ -68,6 +66,13 @@ int h2=39;int s2=255;int v2=255;
 double beginTime=0;
 double endTime=0;
 double StopTime=0;
+double beginTime2=0;
+double endTime2=0;
+double StopTime2=0;
+
+//variable to confirm double click
+int clc=0;
+bool doubleclick = false;
 
 //Creating the trackbars
 cvCreateTrackbar("Hue_1","Control",&h1,255,0);
@@ -135,14 +140,43 @@ while(1)
 	StopTime = beginTime - endTime;
 	
 	// Implement left mouse click event
-	if(StopTime > 0.5  && endTime >0 )
+	if(StopTime > 0.3  && endTime >0 && clc < 1 )
 	{
 		//MouseClick Event
 		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
 		cout<<" click "<<endl;
 		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
 		endTime=0;
+		clc ++;
+		beginTime2 = timestamp;
+		cout<<beginTime2<<endl;
+		doubleclick = true;
 	}
+	//counting for enable double clicks.
+	StopTime2 = endTime2 - beginTime2; 
+	
+	//disable double click if time elaspe more than 0.6 second
+	if(StopTime2 > 0.6)
+	{
+		beginTime2 = 0;
+		clc = 0;
+		doubleclick = false;
+	}
+
+	//Double click event triggered 
+	if(clc == 1 && StopTime2 >0.3 && endTime2 > 0)
+	{
+		//Double MouseClick Event
+		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+		cout<<" Double click "<<endl;
+		endTime=0;
+		endTime2 = 0;
+		clc = 0; 
+	}
+
 	
 	for (CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
 	{
@@ -169,6 +203,10 @@ while(1)
 		cursorCaptured = true;
 		SetCursorPos(x,y);
 		endTime = timestamp;
+		if(doubleclick)
+		{
+			endTime2 = timestamp;
+		}
 	}
 
 	
