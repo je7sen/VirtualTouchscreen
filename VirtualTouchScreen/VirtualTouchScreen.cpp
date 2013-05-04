@@ -69,10 +69,17 @@ double StopTime=0;
 double beginTime2=0;
 double endTime2=0;
 double StopTime2=0;
+double beginTime3=0;
+double endTime3=0;
+double StopTime3=0;
 
 //variable to confirm double click
 int clc=0;
 bool doubleclick = false;
+
+//variable to confirm long click
+bool ToEnableLongClick = false;
+bool longclick = false;
 
 //Creating the trackbars
 cvCreateTrackbar("Hue_1","Control",&h1,255,0);
@@ -88,7 +95,6 @@ while(1)
 	//Getting the current frame
 	IplImage *fram=cvQueryFrame(capture);
 
-	//------------------
 	//Getting time in seconds
 	double timestamp = (double)clock()/CLOCKS_PER_SEC;
 
@@ -135,6 +141,7 @@ while(1)
 	
 	//time counting to enable click
 	beginTime = timestamp;
+	beginTime3 = timestamp;
 	//cout<<"Begin Time :"<<beginTime<<endl;
 	//cout<<"End Time :"<<endTime<<endl;
 	StopTime = beginTime - endTime;
@@ -149,14 +156,19 @@ while(1)
 		endTime=0;
 		clc ++;
 		beginTime2 = timestamp;
-		cout<<beginTime2<<endl;
+		endTime3 = timestamp;
+		//cout<<beginTime2<<endl;
 		doubleclick = true;
+		ToEnableLongClick = true;
+
 	}
+
+				
 	//counting for enable double clicks.
 	StopTime2 = endTime2 - beginTime2; 
 	
 	//disable double click if time elaspe more than 0.6 second
-	if(StopTime2 > 0.6)
+	if(StopTime2 > 1.5 && doubleclick )
 	{
 		beginTime2 = 0;
 		clc = 0;
@@ -164,7 +176,7 @@ while(1)
 	}
 
 	//Double click event triggered 
-	if(clc == 1 && StopTime2 >0.3 && endTime2 > 0)
+	if(doubleclick && StopTime2 >0.3 && endTime2 > 0)
 	{
 		//Double MouseClick Event
 		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
@@ -172,14 +184,55 @@ while(1)
 		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
 		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
 		cout<<" Double click "<<endl;
-		endTime=0;
+		endTime = 0;
 		endTime2 = 0;
+		endTime3 = 0;
+		doubleclick = false;
+		ToEnableLongClick = false;
 		clc = 0; 
 	}
 
+	//counting for long click condition
+	StopTime3 = beginTime3 - endTime3;
 	
+	//enable long click 
+	if(clc = 1 && endTime3 >0 && ToEnableLongClick)
+	{
+		if(StopTime3 > 1.5)
+		{
+			mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+			cout<<" long click "<<endl;
+			clc = 0;
+			endTime2=0;
+			doubleclick = false;
+			ToEnableLongClick = false;
+			longclick = true;
+		}
+		
+	}
+
+	//disable long click if time more than 3 second
+	if(StopTime3 > 6 && longclick )
+	{
+		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+		cout<<" release long click"<<endl;
+		clc = 0;
+		endTime3=0;
+		longclick = false;
+	}
+
+		
 	for (CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
 	{
+		
+		//reset clc to enable left click again if long click enabled
+		if( ToEnableLongClick)
+		{
+			ToEnableLongClick = false;
+			longclick =  false;
+			clc = 0;
+		}
+
 		double moment10 = it->second->m10;
 		double moment01 = it->second->m01;
 		double area = it->second->area;
@@ -202,11 +255,19 @@ while(1)
 		//Moving the mouse pointer
 		cursorCaptured = true;
 		SetCursorPos(x,y);
+
+		//release long mouse click
+		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+		
+		//record time 
 		endTime = timestamp;
+		
 		if(doubleclick)
 		{
 			endTime2 = timestamp;
 		}
+
+		
 	}
 
 	
