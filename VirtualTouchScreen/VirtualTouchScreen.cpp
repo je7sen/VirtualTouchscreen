@@ -136,7 +136,7 @@ while(1)
 	//Thresholding the fram for skin colour
 	cvInRangeS(hsvframe,cvScalar(h3,s3,v3),cvScalar(h4,s4,v4),threshy2);
 
-	
+
 	//Filtering the frame
 	cvSmooth(threshy,threshy,CV_MEDIAN,7,7);
 
@@ -169,15 +169,20 @@ while(1)
 	// Start capturing cursor (found cursor on screen)
 	int x = 0;
 	int y = 0;
-	
-	
+
+
 	//time counting to enable click
 	beginTime = timestamp;
 	beginTime3 = timestamp;
+	if(doubleclick)
+	{
+		beginTime2 = timestamp;
+	}
+
 	//cout<<"Begin Time :"<<beginTime<<endl;
 	//cout<<"End Time :"<<endTime<<endl;
 	StopTime = beginTime - endTime;
-	
+
 	// Implement left mouse click event
 	if(StopTime > 0.3  && endTime >0 && clc < 1 )
 	{
@@ -186,19 +191,20 @@ while(1)
 		cout<<" click "<<endl;
 		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
 		endTime=0;
-		clc ++;
-		beginTime2 = timestamp;
+		clc = 1;
+		
+		//beginTime2 = timestamp;
 		endTime3 = timestamp;
-		//cout<<beginTime2<<endl;
+		cout<<beginTime2<<endl;
 		doubleclick = true;
 		ToEnableLongClick = true;
 
 	}
 
-				
+
 	//counting for enable double clicks.
-	StopTime2 = endTime2 - beginTime2; 
-	
+	StopTime2 = beginTime2 - endTime2; 
+
 	//disable double click if time elaspe more than 1.5 second
 	if(StopTime2 > 1.5 && doubleclick )
 	{
@@ -226,7 +232,7 @@ while(1)
 
 	//counting for long click condition
 	StopTime3 = beginTime3 - endTime3;
-	
+
 	//enable long click 
 	if(clc = 1 && endTime3 >0 && ToEnableLongClick)
 	{
@@ -240,7 +246,7 @@ while(1)
 			ToEnableLongClick = false;
 			longclick = true;
 		}
-		
+
 	}
 
 	//disable long click if time more than 4 second
@@ -253,17 +259,19 @@ while(1)
 		longclick = false;
 	}
 
-		
+
 	for (CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
 	{
-		
+
 		//reset clc to enable left click again if long click enabled
 		if( ToEnableLongClick)
 		{
 			ToEnableLongClick = false;
 			longclick =  false;
-			clc = 0;
+			
 		}
+
+		
 
 		double moment10 = it->second->m10;
 		double moment01 = it->second->m01;
@@ -286,22 +294,23 @@ while(1)
 
 		//Moving the mouse pointer
 		SetCursorPos(x,y);
-		
+
 		//release long mouse click
 		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
 
-		
-		
+
+
 		//record time for first click
 		endTime = timestamp;
-		
+
 		//enable time for double click if first click is trigger
 		if(doubleclick)
 		{
+			endTime2 = 0;
 			endTime2 = timestamp;
 		}
 
-		
+
 	}
 
 	for (CvBlobs::const_iterator ti=blobs2.begin(); ti!=blobs2.end(); ++ti)
@@ -328,15 +337,15 @@ while(1)
 		cout<<" Right click"<<endl;
 		}
 
-	
 
-		
+
+
 	//Showing the images
 	cvShowImage("Live",frame);
 	cvAnd(threshy,threshy2,threshy3);
 	cvShowImage("Threshold Filter",threshy);
 	cvShowImage("Threshold Filter2",threshy2);
-	
+
 
 	//Escape Sequence
 	char c=cvWaitKey(33);
