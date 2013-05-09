@@ -161,10 +161,10 @@ while(1)
 	//changepicture(threcpy,mhi,orient,frame,timestamp);
 
 	//Filtering the blobs
-	cvFilterByArea(blobs,60,500);
+	cvFilterByArea(blobs,60,800);
 
 	//Filtering the blobs
-	cvFilterByArea(blobs2,60,500);
+	cvFilterByArea(blobs2,60,800);
 
 	// Start capturing cursor (found cursor on screen)
 	int x = 0;
