@@ -184,7 +184,7 @@ while(1)
 	StopTime = beginTime - endTime;
 
 	// Implement left mouse click event
-	if(StopTime > 0.3  && endTime >0 && clc < 1 )
+	if(StopTime > 0.3  && endTime >0 && clc == 0 )
 	{
 		//MouseClick Event
 		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
@@ -195,7 +195,7 @@ while(1)
 		
 		//beginTime2 = timestamp;
 		endTime3 = timestamp;
-		cout<<beginTime2<<endl;
+		//cout<<beginTime2<<endl;
 		doubleclick = true;
 		ToEnableLongClick = true;
 
@@ -204,9 +204,15 @@ while(1)
 
 	//counting for enable double clicks.
 	StopTime2 = beginTime2 - endTime2; 
+	/*cout<<"Begintime2 :"<<beginTime2<<endl;
+	cout<<"Endtime2 :"<<endTime2<<endl;
+	cout<<"Stoptime2 :"<<StopTime2<<endl;*/
+	cout<<"Begintime2 :"<<beginTime2<<endl;
+	cout<<"Endtime2 :"<<endTime2<<endl;
+	cout<<"Stoptime2 :"<<StopTime2<<endl;
 
 	//disable double click if time elaspe more than 1.5 second
-	if(StopTime2 > 1.5 && doubleclick )
+	if(StopTime2 > 3 && doubleclick )
 	{
 		beginTime2 = 0;
 		clc = 0;
@@ -234,7 +240,7 @@ while(1)
 	StopTime3 = beginTime3 - endTime3;
 
 	//enable long click 
-	if(clc = 1 && endTime3 >0 && ToEnableLongClick)
+	if(clc == 1 && endTime3 >0 && ToEnableLongClick)
 	{
 		if(StopTime3 > 1.5)
 		{
@@ -262,6 +268,15 @@ while(1)
 
 	for (CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
 	{
+		//record time for first click
+		endTime = timestamp;
+
+		//enable time for double click if first click is trigger
+		if(doubleclick)
+		{
+			
+			endTime2 = timestamp;
+		}
 
 		//reset clc to enable left click again if long click enabled
 		if( ToEnableLongClick)
@@ -270,9 +285,7 @@ while(1)
 			longclick =  false;
 			
 		}
-
-		
-
+				
 		double moment10 = it->second->m10;
 		double moment01 = it->second->m01;
 		double area = it->second->area;
@@ -297,20 +310,7 @@ while(1)
 
 		//release long mouse click
 		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
-
-
-
-		//record time for first click
-		endTime = timestamp;
-
-		//enable time for double click if first click is trigger
-		if(doubleclick)
-		{
-			endTime2 = 0;
-			endTime2 = timestamp;
-		}
-
-
+		
 	}
 
 	for (CvBlobs::const_iterator ti=blobs2.begin(); ti!=blobs2.end(); ++ti)
