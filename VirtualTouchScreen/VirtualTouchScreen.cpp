@@ -174,11 +174,10 @@ while(1)
 	//time counting to enable click
 	beginTime = timestamp;
 	beginTime3 = timestamp;
-	if(doubleclick)
+	/*if(doubleclick)
 	{
 		beginTime2 = timestamp;
-	}
-
+	}*/
 	//cout<<"Begin Time :"<<beginTime<<endl;
 	//cout<<"End Time :"<<endTime<<endl;
 	StopTime = beginTime - endTime;
@@ -193,7 +192,7 @@ while(1)
 		endTime=0;
 		clc = 1;
 		
-		//beginTime2 = timestamp;
+		beginTime2 = timestamp;
 		endTime3 = timestamp;
 		//cout<<beginTime2<<endl;
 		doubleclick = true;
@@ -203,13 +202,11 @@ while(1)
 
 
 	//counting for enable double clicks.
-	StopTime2 = beginTime2 - endTime2; 
+	StopTime2 =  endTime2 - beginTime2; 
 	/*cout<<"Begintime2 :"<<beginTime2<<endl;
 	cout<<"Endtime2 :"<<endTime2<<endl;
 	cout<<"Stoptime2 :"<<StopTime2<<endl;*/
-	cout<<"Begintime2 :"<<beginTime2<<endl;
-	cout<<"Endtime2 :"<<endTime2<<endl;
-	cout<<"Stoptime2 :"<<StopTime2<<endl;
+	
 
 	//disable double click if time elaspe more than 1.5 second
 	if(StopTime2 > 3 && doubleclick )
@@ -238,12 +235,11 @@ while(1)
 
 	//counting for long click condition
 	StopTime3 = beginTime3 - endTime3;
+	cout<<"StopTime3 :"<<StopTime3<<endl;
 
 	//enable long click 
-	if(clc == 1 && endTime3 >0 && ToEnableLongClick)
+	if(StopTime3 > 1.5 && clc == 1 && endTime3 >0 && ToEnableLongClick)
 	{
-		if(StopTime3 > 1.5)
-		{
 			mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
 			cout<<" long click "<<endl;
 			clc = 0;
@@ -251,8 +247,7 @@ while(1)
 			doubleclick = false;
 			ToEnableLongClick = false;
 			longclick = true;
-		}
-
+		
 	}
 
 	//disable long click if time more than 4 second
@@ -283,6 +278,8 @@ while(1)
 		{
 			ToEnableLongClick = false;
 			longclick =  false;
+			//release long mouse click
+			mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
 			
 		}
 				
@@ -308,8 +305,7 @@ while(1)
 		//Moving the mouse pointer
 		SetCursorPos(x,y);
 
-		//release long mouse click
-		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+		
 		
 	}
 
