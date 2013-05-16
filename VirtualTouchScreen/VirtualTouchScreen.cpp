@@ -24,12 +24,6 @@ using namespace std;
 
 int main()
 {
-//--------------------
-//Function prototypes
-void findxy(IplImage*,int*,int*,IplImage*);     //Function to find X and Y
-double detectangle(IplImage*,IplImage*,double,IplImage*,IplImage*);//Angle measure
-double findvelocity(IplImage*);//Velocity measure
-void changepicture(IplImage*,IplImage*,IplImage*,IplImage*,double);
 
 
 //Structure to get feed from CAM
@@ -54,10 +48,7 @@ IplImage *threshy=cvCreateImage(cvSize(w,h),8,1); //Threshold image of yellow co
 IplImage *labelImg2=cvCreateImage(cvSize(w,h),IPL_DEPTH_LABEL,1);//Image Variable for blobs2
 IplImage *threshy2=cvCreateImage(cvSize(w,h),8,1); //Threshold image of skin color
 IplImage *threshy3=cvCreateImage(cvSize(w,h),8,1); //Threshold image of combine
-//------------------
-IplImage *threcpy=cvCreateImage(cvSize(w,h),8,1); //Copy to pass to image velocity finder
-IplImage *mhi=cvCreateImage(cvSize(w,h),32,1);    //Motion History Image update
-IplImage *orient=cvCreateImage(cvSize(w,h),32,1); //Orientation Image
+
 
 
 //Getting the screen information
@@ -155,11 +146,7 @@ while(1)
 	//Rendering the blobs
 	cvRenderBlobs(labelImg2,blobs2,frame,frame);
 
-	//-----------------------
-	//Copying the yellow thresh image to pass to change picture
-	cvCopy(threshy,threcpy);
-	//changepicture(threcpy,mhi,orient,frame,timestamp);
-
+	
 	//Filtering the blobs
 	//cvFilterByArea(blobs,60,1000);
 
@@ -175,28 +162,41 @@ while(1)
 	beginTime = timestamp;
 	beginTime3 = timestamp;
 	
-	//cout<<"Begin Time :"<<beginTime<<endl;
-	//cout<<"End Time :"<<endTime<<endl;
+	//calculate time span to enable left mouse click
 	StopTime = beginTime - endTime;
 
-	// Implement left mouse click event
+	// Implement left mouse click event or disable long click
 	if(StopTime > 0.3  && endTime >0 && clc == 0 )
 	{
-		//MouseClick Event
-		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
-		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
-		cout<<" click "<<endl;
-		endTime=0;
-		clc = 1;
-		
-		//beginTime2 = timestamp;
-		endTime3 = timestamp;
-		//cout<<beginTime2<<endl;
-		doubleclick = true;
-		ToEnableLongClick = true;
+		//reset clc to enable left click again if long click enabled
+		if( longclick)
+		{
+			ToEnableLongClick = false;
+			longclick =  false;
+			endTime3 = 0;
+			//release long mouse click
+			mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+			cout<<" Left_Up"<<endl;
+			
+		}
+
+		else
+		{
+			//MouseClick Event
+			mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
+			mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+			cout<<" click "<<endl;
+			endTime=0;
+			clc = 1;
+					
+			endTime3 = timestamp;
+			doubleclick = true;
+			ToEnableLongClick = true;
+		}
 
 	}
 
+	//stamp time for calculate double click event
 	if(doubleclick)
 	{
 		beginTime2 = timestamp;
@@ -205,12 +205,7 @@ while(1)
 
 	//counting for enable double clicks.
 	StopTime2 = beginTime2 - endTime2; 
-	/*cout<<"Begintime2 :"<<beginTime2<<endl;
-	cout<<"Endtime2 :"<<endTime2<<endl;
-	cout<<"Stoptime2 :"<<StopTime2<<endl;*/
 	
-	
-
 	//Double click event triggered 
 	if(doubleclick && StopTime2 >0.3 && StopTime2 < 1.5 && endTime2 > 0)
 	{
@@ -228,6 +223,7 @@ while(1)
 		clc = 0; 
 	}
 
+	//disable double click condition
 	if(StopTime2 >1.5 && doubleclick && endTime2 > 0)
 	{
 		endTime = 0;
@@ -238,8 +234,7 @@ while(1)
 
 	//counting for long click condition
 	StopTime3 = beginTime3 - endTime3;
-	//cout<<"StopTime3 :"<<StopTime3<<endl;
-
+	
 	//enable long click 
 	if(StopTime3 > 1.5 && endTime3 >0 && ToEnableLongClick)
 	{
@@ -253,7 +248,7 @@ while(1)
 		
 	}
 
-	//disable long click if time more than 4 second
+	/*disable long click if time more than 4 second
 	if(StopTime3 > 4 && longclick )
 	{
 		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
@@ -261,7 +256,7 @@ while(1)
 		clc = 0;
 		endTime3=0;
 		longclick = false;
-	}
+	}*/
 
 
 	for (CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
@@ -286,8 +281,8 @@ while(1)
 			endTime2 = timestamp;
 		}
 
-		float stopdoubleclick = endTime2 - endTime3;
 		//disable double click if time elaspe more than 1.5 second
+		float stopdoubleclick = endTime2 - endTime3;
 		if(stopdoubleclick > 1.5 && doubleclick )
 		{
 			beginTime2 = 0;
@@ -295,18 +290,7 @@ while(1)
 			doubleclick = false;
 		}
 
-		//reset clc to enable left click again if long click enabled
-		if( longclick)
-		{
-			ToEnableLongClick = false;
-			longclick =  false;
-			endTime3 = 0;
-			//release long mouse click
-			mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
-			cout<<" Left_Up"<<endl;
-			
-		}
-				
+						
 		double moment10 = it->second->m10;
 		double moment01 = it->second->m01;
 		double area = it->second->area;
@@ -328,11 +312,10 @@ while(1)
 
 		//Moving the mouse pointer
 		SetCursorPos(x,y);
-
-		
 		
 	}
 
+	
 	for (CvBlobs::const_iterator ti=blobs2.begin(); ti!=blobs2.end(); ++ti)
 		{
 		double moment10_2 = ti->second->m10;
@@ -358,8 +341,6 @@ while(1)
 		}
 
 
-
-
 	//Showing the images
 	cvShowImage("Live",frame);
 	cvAnd(threshy,threshy2,threshy3);
@@ -377,36 +358,3 @@ while(1)
 cvReleaseCapture(&capture);
 cvDestroyAllWindows();
 }
-
-
-/* ||CalculateAngle||
--------------------------
-
-double detectangle(IplImage *thresh,IplImage *mhi,double timestamp,IplImage *orient,IplImage *frame)
-{
-//Updating the motion history
-cvUpdateMotionHistory(thresh,mhi,timestamp,1);
-
-//Calculating motion gradient
-cvCalcMotionGradient( mhi,thresh, orient,.5,.05, 3 );
-
-//Rectangle
-CvRect rectangle;
-
-//Setting ROI
-rectangle=cvRect( 0, 0,w,h);
-
-// select component ROI
-cvSetImageROI(frame,rectangle );
-cvSetImageROI( mhi,rectangle );
-cvSetImageROI( orient,rectangle);
-cvSetImageROI(thresh,rectangle);
-
-//Calculating the angle
-double angle=cvCalcGlobalOrientation(orient,thresh, mhi, timestamp,1);
-angle=360.0-angle;
-
-// cout<<"Angle:"<<angle<<endl;
-return angle;
-}
-*/
