@@ -161,10 +161,10 @@ while(1)
 	//changepicture(threcpy,mhi,orient,frame,timestamp);
 
 	//Filtering the blobs
-	cvFilterByArea(blobs,60,800);
+	//cvFilterByArea(blobs,60,1000);
 
 	//Filtering the blobs
-	cvFilterByArea(blobs2,60,800);
+	//cvFilterByArea(blobs2,60,1000);
 
 	// Start capturing cursor (found cursor on screen)
 	int x = 0;
@@ -174,10 +174,7 @@ while(1)
 	//time counting to enable click
 	beginTime = timestamp;
 	beginTime3 = timestamp;
-	/*if(doubleclick)
-	{
-		beginTime2 = timestamp;
-	}*/
+	
 	//cout<<"Begin Time :"<<beginTime<<endl;
 	//cout<<"End Time :"<<endTime<<endl;
 	StopTime = beginTime - endTime;
@@ -187,12 +184,12 @@ while(1)
 	{
 		//MouseClick Event
 		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
-		cout<<" click "<<endl;
 		mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+		cout<<" click "<<endl;
 		endTime=0;
 		clc = 1;
 		
-		beginTime2 = timestamp;
+		//beginTime2 = timestamp;
 		endTime3 = timestamp;
 		//cout<<beginTime2<<endl;
 		doubleclick = true;
@@ -200,24 +197,22 @@ while(1)
 
 	}
 
+	if(doubleclick)
+	{
+		beginTime2 = timestamp;
+	}
+
 
 	//counting for enable double clicks.
-	StopTime2 =  endTime2 - beginTime2; 
+	StopTime2 = beginTime2 - endTime2; 
 	/*cout<<"Begintime2 :"<<beginTime2<<endl;
 	cout<<"Endtime2 :"<<endTime2<<endl;
 	cout<<"Stoptime2 :"<<StopTime2<<endl;*/
 	
-
-	//disable double click if time elaspe more than 1.5 second
-	if(StopTime2 > 3 && doubleclick )
-	{
-		beginTime2 = 0;
-		clc = 0;
-		doubleclick = false;
-	}
+	
 
 	//Double click event triggered 
-	if(doubleclick && StopTime2 >0.3 && endTime2 > 0)
+	if(doubleclick && StopTime2 >0.3 && StopTime2 < 1.5 && endTime2 > 0)
 	{
 		//Double MouseClick Event
 		mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
@@ -233,12 +228,20 @@ while(1)
 		clc = 0; 
 	}
 
+	if(StopTime2 >1.5 && doubleclick && endTime2 > 0)
+	{
+		endTime = 0;
+		endTime2 = 0;
+		doubleclick = false;
+		clc = 0;		
+	}
+
 	//counting for long click condition
 	StopTime3 = beginTime3 - endTime3;
-	cout<<"StopTime3 :"<<StopTime3<<endl;
+	//cout<<"StopTime3 :"<<StopTime3<<endl;
 
 	//enable long click 
-	if(StopTime3 > 1.5 && clc == 1 && endTime3 >0 && ToEnableLongClick)
+	if(StopTime3 > 1.5 && endTime3 >0 && ToEnableLongClick)
 	{
 			mouse_event(MOUSEEVENTF_LEFTDOWN, x, y, 0, 0);
 			cout<<" long click "<<endl;
@@ -266,6 +269,16 @@ while(1)
 		//record time for first click
 		endTime = timestamp;
 
+		//reset clc to enable left click again if long click enabled
+		if( ToEnableLongClick)
+		{
+			ToEnableLongClick = false;
+			longclick =  false;
+			endTime3 = 0;
+			
+			
+		}
+
 		//enable time for double click if first click is trigger
 		if(doubleclick)
 		{
@@ -273,13 +286,24 @@ while(1)
 			endTime2 = timestamp;
 		}
 
+		float stopdoubleclick = endTime2 - endTime3;
+		//disable double click if time elaspe more than 1.5 second
+		if(stopdoubleclick > 1.5 && doubleclick )
+		{
+			beginTime2 = 0;
+			clc = 0;
+			doubleclick = false;
+		}
+
 		//reset clc to enable left click again if long click enabled
-		if( ToEnableLongClick)
+		if( longclick)
 		{
 			ToEnableLongClick = false;
 			longclick =  false;
+			endTime3 = 0;
 			//release long mouse click
 			mouse_event(MOUSEEVENTF_LEFTUP, x, y, 0, 0);
+			cout<<" Left_Up"<<endl;
 			
 		}
 				
@@ -300,7 +324,7 @@ while(1)
 		y=(int)(y1*screeny/h);
 
 		//Printing the position information
-		cout<<"X-CursorPosition: "<<x<<" Y-CursorPosition: "<<y<<endl;
+		//cout<<"X-CursorPosition: "<<x<<" Y-CursorPosition: "<<y<<endl;
 
 		//Moving the mouse pointer
 		SetCursorPos(x,y);
